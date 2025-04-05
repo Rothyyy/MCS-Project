@@ -89,8 +89,8 @@ class NMCS:
                         print(f"Best score = {best_state_score} after {time_passed}s")
                         return best_state
         
-            state.play(best_state.sequence[len(state.sequence)])
-            # state.play(best_state.sequence[-1])
+            # state.play(best_state.sequence[len(state.sequence)])
+            state.play(best_state.sequence[-1])
         return state 
 
 

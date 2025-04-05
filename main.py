@@ -13,8 +13,9 @@ def make_path(n_vertices: int) -> Graph:
 
 
 if __name__== "__main__":
-    init_state = make_path(12)
-    algo_state = launch_nmcs(init_state, 2)
+    init_state = make_path(14)
+    level = 2
+    algo_state = launch_nmcs(init_state, level)
 
     A = algo_state.adj_mat
     print(A)
