@@ -4,7 +4,7 @@ from State import BEST_SCORE
 import time
 
 MAX_TIMEOUT = 300
-
+NUM_PLAYOUT = 3
 
 
 class NMCS:
@@ -56,16 +56,28 @@ class NMCS:
                 new_state = state.clone()
                 new_state.play(move)
                 
+                temp_best = new_state.clone()
+                temp_best_score = temp_best.score()
+                
                 if level <= 1:
-                    new_state = self.playout(new_state)
+                    for _ in range(NUM_PLAYOUT):
+                        new_state = state.clone()
+                        new_state.play(move)
+                        new_state = self.playout(new_state)
+                        new_score = new_state.score()
+                        if new_score > temp_best_score:
+                            temp_best_score = new_score
+                            temp_best = new_state.clone()
                 else:
-                    new_state = self.nmcs(new_state, level-1)
+                    temp_best = self.nmcs(new_state, level-1)
             
-                new_state_score = new_state.score()
+                new_state_score = temp_best.score()
 
                 if new_state_score > best_state_score:
-                    best_state = new_state
+                    best_state = temp_best.clone()
+                    best_state.best_score = new_state_score
                     best_state_score = new_state_score
+
                     if best_state_score > self.best_score_yet:
                         self.best_score_yet = best_state_score
                         time_passed = time.time() - self.start_time 
