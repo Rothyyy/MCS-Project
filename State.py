@@ -80,7 +80,7 @@ class Graph:
         return -(np.floor(self.n_vertices / INDEX_CONJECTURE) - eigen -1)
 
     def terminal(self) -> bool:
-        return self.no_improvement_possible
+        return True if self.score() > 0 else False
 
 
     def clone(self):
