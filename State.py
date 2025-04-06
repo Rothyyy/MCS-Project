@@ -8,13 +8,22 @@ class Move:
     def __init__(self, start, end):
         self.start = start
         self.end = end
+    
+    def code(self, state):
+        n = state.n_vertices
+        #We look if we are removing or adding an edge
+        if state.adj_mat[self.start, self.end] == 0:
+            add_or_remove = 1
+        else:
+            add_or_remove = 0
+
+        return 2*n*self.start + 2*self.end + add_or_remove
 
 class Graph:
     def __init__(self, n_vertices, adj_mat):
         self.n_vertices = n_vertices
         self.adj_mat = adj_mat
         self.best_score = self.score()
-        self.no_improvement_possible = False
         self.sequence = []
     
     def play(self, move:Move) -> None:
@@ -80,7 +89,7 @@ class Graph:
         return -(np.floor(self.n_vertices / INDEX_CONJECTURE) - eigen -1)
 
     def terminal(self) -> bool:
-        return True if self.score() > 0 else False
+        return self.score() > 0
 
 
     def clone(self):
