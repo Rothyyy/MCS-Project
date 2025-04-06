@@ -119,6 +119,7 @@ class NRPA:
 
 
 def launch_nrpa(self, init_state, level):
+    policy = dict()
     algo = NRPA()
-    graph = algo.nrpa(init_state, level)
+    graph = algo.nrpa(level, policy, init_state)
     return graph
