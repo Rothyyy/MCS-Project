@@ -1,9 +1,10 @@
 import numpy as np
 from State import Graph
+from State import BEST_SCORE
 import time
 
 MAX_TIMEOUT = 300
-NUM_PLAYOUT = 100
+NUM_PLAYOUT = 50
 
 class NRPA:
     def __init__(self):
@@ -18,16 +19,18 @@ class NRPA:
         """
         total = 0
         for move in move_list:
-            if move in policy:
-                total += np.exp(policy[move])
+            move_tuple = (move.start, move.end)
+            if move_tuple in policy:
+                total += np.exp(policy[move_tuple])
             else:
-                policy[move] = 0.0
+                policy[move_tuple] = 0.0
                 total += 1
 
         stop = total*np.random.uniform(0,1)
         total = 0
         for move in move_list:
-            total += np.exp(policy[move])
+            move_tuple = (move.start, move.end)
+            total += np.exp(policy[move_tuple])
             if total > stop:
                 return move
         
@@ -69,19 +72,21 @@ class NRPA:
             move_list = s.legal_moves()
             total = 0
             for move in move_list:
-                if move in policy:
-                    total += np.exp(policy[move])
+                move_tuple = (move.start, move.end)
+                if move_tuple in policy:
+                    total += np.exp(policy[move_tuple])
                 else:
-                    policy[move] = 0
+                    policy[move_tuple] = 0
                     total += 1
             
             for move in move_list:
-                if move in polp:
-                    polp[move] -= np.exp(policy[move])/total
+                move_tuple = (move.start, move.end)
+                if move_tuple in polp:
+                    polp[move_tuple] -= np.exp(policy[move_tuple])/total
                 else:
-                    polp[move] = -np.exp(policy[move])/total
-            
-            polp[best] += 1
+                    polp[move_tuple] = -np.exp(policy[move_tuple])/total
+            best_tuple = (best.start, best.end)
+            polp[best_tuple] += 1
             s.play(best)
 
         return polp
@@ -111,14 +116,21 @@ class NRPA:
                     best_state_score = st_score
                     best_state.best_score = st_score
                     best_state = st.clone()
-                    print(f"NRPA best score yet : {best_state.best_score}")
+                    print(f"NRPA best score yet : {best_state.best_score} after {time.time()-self.start_time}s")
+
+                # IF WE ONLY CARE ABOUT GETTING A COUNTER EXAMPLE
+                if st_score > BEST_SCORE:
+                    print("The conjecture has been refuted !")
+                    time_passed = time.time() - self.start_time 
+                    print(f"Best score = {best_state_score} after {time_passed}s")
+                    return best_state
 
             policy = self.adapt(policy, st, ini_state.clone())
 
         return best_state
 
 
-def launch_nrpa(self, init_state, level):
+def launch_nrpa(init_state, level):
     policy = dict()
     algo = NRPA()
     graph = algo.nrpa(level, policy, init_state)

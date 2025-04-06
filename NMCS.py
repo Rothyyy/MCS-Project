@@ -40,7 +40,7 @@ class NMCS:
 
     def nmcs(self, state: Graph, level: int) -> Graph:
         best_state = state.clone()
-        best_state_score = -1
+        best_state_score = best_state.score()
 
         while not(state.terminal()):
             move_list = state.legal_moves()
@@ -85,7 +85,7 @@ class NMCS:
                         print(f"NMCS best score yet : {best_state_score} after {time_passed}s")
                     
                     if best_state_score > BEST_SCORE:
-                        print(f"The conjecture has been refuted !")
+                        print("The conjecture has been refuted !")
                         time_passed = time.time() - self.start_time 
                         print(f"Best score = {best_state_score} after {time_passed}s")
                         return best_state
