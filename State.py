@@ -24,6 +24,7 @@ class Graph:
         self.n_vertices = n_vertices
         self.adj_mat = adj_mat
         self.best_score = self.score()
+        self.no_improvement_possible = False
         self.sequence = []
     
     def play(self, move:Move) -> None:
