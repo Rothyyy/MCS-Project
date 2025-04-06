@@ -24,6 +24,7 @@ class NMCS:
         while not(state.terminal()):
             move_list = state.legal_moves()
             if len(move_list) == 0:
+                best_state.no_improvement_possible = True
                 break
             move_to_play = np.random.choice(move_list)
             state.play(move_to_play)

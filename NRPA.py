@@ -3,63 +3,120 @@ from State import Graph
 import time
 
 MAX_TIMEOUT = 300
+NUM_PLAYOUT = 100
 
 class NRPA:
     def __init__(self):
         self.best_score_yet = -1
         self.start_time = time.time()
 
-    def playout(self, state:Graph) -> Graph:
-        best_state = state.clone()
-        best_state_score = -1
+    def random_move(self, move_list, policy:dict):
+        """
+        Parameters:
+        move_list : List of moves
+        policy : Dictionnary (key = move, value = float)
+        """
+        total = 0
+        for move in move_list:
+            if move in policy:
+                total += np.exp(policy[move])
+            else:
+                policy[move] = 0.0
+                total += 1
 
-        if state.terminal():
-            best_state_score = best_state.score()
+        stop = total*np.random.uniform(0,1)
+        total = 0
+        for move in move_list:
+            total += np.exp(policy[move])
+            if total > stop:
+                return move
+        
+        return move_list[0]
+
+
+    def playout(self, state:Graph, policy) -> Graph:
+        best_state = state.clone()
+        best_state_score = best_state.score()
 
         while not(state.terminal()):
             move_list = state.legal_moves()
-            move_to_play = np.random.choice(move_list)
-            state.play(move_to_play)
+
+            if len(move_list) == 0:
+                best_state.no_improvement_possible = True
+                break
+
+            move = self.random_move(move_list, policy)
+            state.play(move)
 
             # IF WE CONSIDER NON TERMINAL STATE
-            # new_score = state.score()
-            # if new_score > best_state_score:
-            #     best_state_score = new_score
+            # score = state.score()
+            # if score > best_state_score:
+            #     best_state_score = score
             #     best_state = state.clone()
+            #     best_state.best_score = score
 
-        return best_state, best_state_score
+        # If we consider non terminal state:
+        # return best_state
+
+        return state
     
-    def nrpa(self, state: Graph, level: int) -> Graph:
-        best_state = state.clone()
-        best_state_score = -10
 
-        while not(best_state.terminal()):
-            move_list = state.legal_moves()
+    def adapt(self, policy:dict, state:Graph, ini_state:Graph):
+        s = ini_state.clone()
+        polp = policy.copy()
 
+        for best in state.sequence:
+            move_list = s.legal_moves()
+            total = 0
             for move in move_list:
-                # Check for timeout
-                if time.time() - self.start_time > MAX_TIMEOUT:
-                    return best_state
-
-                new_state = state.clone()
-                new_state.play(move)
-                
-                if level <= 1:
-                    new_state = self.playout(new_state)
+                if move in policy:
+                    total += np.exp(policy[move])
                 else:
-                    new_state = self.nmcs(new_state, level-1)
+                    policy[move] = 0
+                    total += 1
             
-                new_state_score = new_state.score()
+            for move in move_list:
+                if move in polp:
+                    polp[move] -= np.exp(policy[move])/total
+                else:
+                    polp[move] = -np.exp(policy[move])/total
+            
+            polp[best] += 1
+            s.play(best)
 
-                if new_state_score > best_state_score:
-                    best_state = new_state
-                    best_state_score = new_state_score
-                    if best_state_score > self.best_score_yet:
-                        self.best_score_yet = best_state_score
+        return polp
+            
+
+
+    def nrpa(self, level: int, policy:dict, ini_state:Graph) -> Graph:
+        st = ini_state.clone()
+        st_score = st.score()
+
+        best_state = st.clone()
+        best_state_score = best_state.score()
+
+        if (level == 0) or (time.time()-self.start_time > MAX_TIMEOUT):
+            return self.playout(st, policy)
         
-            state.play(best_state.sequence[len(state.sequence)])
-            # state.play(best_state.sequence[-1])
-        return state 
+        for i in range(NUM_PLAYOUT):
+            pol = policy.copy()
+            s = self.nrpa(level-1, pol, ini_state.clone())
+            s_score = s.score()
+
+            if st_score < s_score:
+                st = s.clone()
+                st_score = s_score
+
+                if st_score > best_state_score:
+                    best_state_score = st_score
+                    best_state.best_score = st_score
+                    best_state = st.clone()
+                    print(f"NRPA best score yet : {best_state.best_score}")
+
+            policy = self.adapt(policy, st, ini_state.clone())
+
+        return best_state
+
 
 def launch_nrpa(self, init_state, level):
     algo = NRPA()
