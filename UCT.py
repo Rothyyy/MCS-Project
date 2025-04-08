@@ -51,9 +51,8 @@ class UCT:
 
         t = self.look(state)
         if t != None:
-            bestValue = 0
+            bestValue = -np.inf
             best = 0
-            moves = state.legal_moves()
             for i in range (0, len(moves)):
                 val = 1000000.0
                 n = t[0]
@@ -94,7 +93,7 @@ class UCT:
         s = state.clone()
         move_list = s.legal_moves()
         while not s.terminal() and len(move_list) != 0:
-            m = self.BestMoveUCT(s, 5*len(move_list))
+            m = self.BestMoveUCT(s, 30*len(move_list))
             s.play(m)
             print(f"Current score : {-s.score()}")
             move_list = s.legal_moves()

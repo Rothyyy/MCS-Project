@@ -64,9 +64,11 @@ class GRAVE:
             tr = tref
             if t[0] > 50:
                 tr = t
-            bestValue = 0
+            bestValue = -np.inf
             best = 0
             bestcode = moves[0].code(state)
+
+            list_val = []
             for i in range (0, len(moves)):
                 val = 1000000.0
                 code = moves[i].code(state)
@@ -78,10 +80,13 @@ class GRAVE:
 
                     AMAF = tr[4][code] / tr[3][code]
                     val = (1.0 - beta) * Q + beta * AMAF
+                list_val.append(val)
                 if val > bestValue:
                     bestValue = val
                     best = i
                     bestcode = code
+            #print(f"Best Value: {bestValue} for move {best}")
+            #print(list_val)
 
             state.play(moves[best])
             played.append (bestcode)
@@ -100,7 +105,6 @@ class GRAVE:
         move_list = state.legal_moves()
         nb_code = 2 * state.n_vertices**2
         self.add(state, len(move_list), nb_code)
-
         for i in range (n):
             root = self.look(state)
             b1 = state.clone()
@@ -109,7 +113,9 @@ class GRAVE:
         moves = state.legal_moves()
         best = moves[0]
         bestValue = root[1][0]
+        #print(f"Move : {bestValue}")
         for i in range (1, len(moves)):
+            #print(f"Move  {root[1][i]}")
             if (root[1][i] > bestValue):
                 bestValue = root[1][i]
                 best = moves[i]
@@ -119,7 +125,7 @@ class GRAVE:
         s = state.clone()
         move_list = s.legal_moves()
         while not s.terminal() and len(move_list) != 0:
-            m = self.BestMoveGRAVE(s, 5*len(move_list))
+            m = self.BestMoveGRAVE(s, 30*len(move_list))
             s.play(m)
             print(f"Current score : {-s.score()}")
             move_list = s.legal_moves()
