@@ -95,7 +95,7 @@ class UCT:
         while not s.terminal() and len(move_list) != 0:
             m = self.BestMoveUCT(s, 30*len(move_list))
             s.play(m)
-            print(f"Current score : {-s.score()}")
+            print(f"Current score : {s.score()}")
             move_list = s.legal_moves()
         return s
 

@@ -24,7 +24,6 @@ class NMCS:
         while not(state.terminal()):
             move_list = state.legal_moves()
             if len(move_list) == 0:
-                best_state.no_improvement_possible = True
                 break
             move_to_play = np.random.choice(move_list)
             state.play(move_to_play)
@@ -40,7 +39,7 @@ class NMCS:
 
     def nmcs(self, state: Graph, level: int) -> Graph:
         best_state = state.clone()
-        best_state_score = best_state.score()
+        best_state_score = -1
 
         while not(state.terminal()):
             move_list = state.legal_moves()
@@ -85,13 +84,13 @@ class NMCS:
                         print(f"NMCS best score yet : {best_state_score} after {time_passed}s")
                     
                     if best_state_score > BEST_SCORE:
-                        print("The conjecture has been refuted !")
+                        print(f"The conjecture has been refuted !")
                         time_passed = time.time() - self.start_time 
                         print(f"Best score = {best_state_score} after {time_passed}s")
                         return best_state
         
-            # state.play(best_state.sequence[len(state.sequence)])
-            state.play(best_state.sequence[-1])
+            state.play(best_state.sequence[len(state.sequence)])
+            # state.play(best_state.sequence[-1])
         return state 
 
 

@@ -1,4 +1,5 @@
 import numpy as np
+import networkx as nx
 import copy
 
 BEST_SCORE = 0
@@ -24,7 +25,6 @@ class Graph:
         self.n_vertices = n_vertices
         self.adj_mat = adj_mat
         self.best_score = self.score()
-        self.no_improvement_possible = False
         self.sequence = []
     
     def play(self, move:Move) -> None:
@@ -48,6 +48,12 @@ class Graph:
         else:
             self.adj_mat[start, end] = 0
             self.adj_mat[end, start] = 0
+            G = nx.from_numpy_array(self.adj_mat)
+
+            if not nx.is_connected(G):
+                self.adj_mat[start, end] = 1
+                self.adj_mat[end, start] = 1
+
         return None
     
     def legal_moves(self) -> list:
@@ -81,13 +87,13 @@ class Graph:
         else:
             return False
 
-
     def score(self) -> float:
-        eigen = np.linalg.eigh(self.adj_mat)[0][::-1]
-        eigen = eigen[INDEX_CONJECTURE-1]
+        eigenvalues = np.linalg.eigh(self.adj_mat)[0][::-1]
+        lbda_1 = eigenvalues[0]
 
-        # Score with blowup graphs
-        return -(np.floor(self.n_vertices / INDEX_CONJECTURE) - eigen -1)
+        G = nx.from_numpy_array(self.adj_mat)
+        D = nx.diameter(G)
+        return  2 + np.sqrt(self.n_vertices-1) - lbda_1 - D
 
     def terminal(self) -> bool:
         return self.score() > 0
