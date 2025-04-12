@@ -1,11 +1,13 @@
 import numpy as np
-from State import Graph
-from State import BEST_SCORE
+import time
+from State_Diameter import Graph
+from State_Diameter import BEST_SCORE
 
 
 class UCT:
     def __init__(self):
         self.table = {}
+        self.start_time = time.time()
 
     def hash_state(self, state:Graph):
         mat = state.adj_mat
@@ -75,7 +77,7 @@ class UCT:
             self.add(state, len(moves))
             return self.playout(state) 
         
-    def BestMoveUCT(self, state, n):
+    def BestMoveUCT(self, state:Graph, n):
         for i in range (n):
             b1 = state.clone()
             res = self.uct_step(b1)
@@ -89,7 +91,7 @@ class UCT:
                 best = moves[i]
         return best
         
-    def uct(self, state):
+    def uct(self, state:Graph):
         s = state.clone()
         move_list = s.legal_moves()
         while not s.terminal() and len(move_list) != 0:
@@ -102,5 +104,6 @@ class UCT:
 
 def launch_uct(init_state) -> Graph:
     algo = UCT()
-    graph = algo.uct(init_state,)
+    graph = algo.uct(init_state)
+    print("Execution time :", time.time()-algo.start_time)
     return graph

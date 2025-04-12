@@ -1,10 +1,12 @@
 import numpy as np
-from State import Graph
-from State import BEST_SCORE
+import time
+from State_Diameter import Graph
+from State_Diameter import BEST_SCORE
 
 class GRAVE:
     def __init__(self):
         self.table = {}
+        self.start_time = time.time()
     
     def hash_state(self, state:Graph):
         mat = state.adj_mat
@@ -101,7 +103,7 @@ class GRAVE:
             self.add(state, len(moves), nb_code)
             return self.playout(state, played)
     
-    def BestMoveGRAVE(self, state, n):
+    def BestMoveGRAVE(self, state:Graph, n):
         move_list = state.legal_moves()
         nb_code = 2 * state.n_vertices**2
         self.add(state, len(move_list), nb_code)
@@ -121,7 +123,7 @@ class GRAVE:
                 best = moves[i]
         return best
     
-    def grave(self, state):
+    def grave(self, state:Graph):
         s = state.clone()
         move_list = s.legal_moves()
         while not s.terminal() and len(move_list) != 0:
@@ -132,7 +134,8 @@ class GRAVE:
             print(f"Edge added ({m.start},{m.end})")
         return s
     
-def launch_grave(init_state) -> Graph:
+def launch_grave(init_state:Graph) -> Graph:
     algo = GRAVE()
-    graph = algo.grave(init_state,)
+    graph = algo.grave(init_state)
+    print("Execution time :", time.time()-algo.start_time)
     return graph

@@ -1,6 +1,6 @@
 import numpy as np
-from State import Graph
-from State import BEST_SCORE
+from State_Diameter import Graph
+from State_Diameter import BEST_SCORE
 import time
 
 MAX_TIMEOUT = 300
@@ -24,6 +24,7 @@ class NMCS:
         while not(state.terminal()):
             move_list = state.legal_moves()
             if len(move_list) == 0:
+                best_state.no_improvement_possible = True
                 break
             move_to_play = np.random.choice(move_list)
             state.play(move_to_play)
@@ -39,7 +40,7 @@ class NMCS:
 
     def nmcs(self, state: Graph, level: int) -> Graph:
         best_state = state.clone()
-        best_state_score = -1
+        best_state_score = best_state.score()
 
         while not(state.terminal()):
             move_list = state.legal_moves()
@@ -89,12 +90,13 @@ class NMCS:
                         print(f"Best score = {best_state_score} after {time_passed}s")
                         return best_state
         
-            state.play(best_state.sequence[len(state.sequence)])
-            # state.play(best_state.sequence[-1])
+            # state.play(best_state.sequence[len(state.sequence)])
+            state.play(best_state.sequence[-1])
         return state 
 
 
 def launch_nmcs(init_state, level) -> Graph:
     algo = NMCS()
     graph = algo.nmcs(init_state, level)
+    print("Execution time :", time.time()-algo.start_time)
     return graph
