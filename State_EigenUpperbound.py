@@ -1,6 +1,7 @@
 import numpy as np
 import copy
 
+BEST_SCORE = 0
 INDEX_CONJECTURE = 4
 
 class Move:
@@ -25,7 +26,6 @@ class Graph:
         self.best_score = self.score()
         self.no_improvement_possible = False
         self.sequence = []
-        self.score_to_refute = 0
     
     def play(self, move:Move) -> None:
         """
