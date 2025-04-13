@@ -1,7 +1,12 @@
 import numpy as np
 import time
-from State_Diameter import Graph
-from State_Diameter import BEST_SCORE
+
+# Import of Graph
+# from State_Diameter import Graph, BEST_SCORE
+# from State_EigenUpperbound import Graph, BEST_SCORE
+# from State_spectralGap_TriangleFree import Graph, BEST_SCORE
+from State_11 import Graph, BEST_SCORE
+# from State_16 import Graph, BEST_SCORE
 
 class GRAVE:
     def __init__(self):

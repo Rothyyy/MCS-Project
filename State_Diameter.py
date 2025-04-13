@@ -3,7 +3,6 @@ import networkx as nx
 import copy
 
 BEST_SCORE = 0
-INDEX_CONJECTURE = 4
 
 class Move:
     def __init__(self, start, end):
@@ -76,7 +75,7 @@ class Graph:
 
     def is_legal_move(self, move: Move):
         """
-        This function will check if it the move is legal or not and will return the tuple (bool, score).
+        This function will check if it the move is legal or not and will return a boolean.
         """
         new_state = self.clone()
         new_state.play(move)

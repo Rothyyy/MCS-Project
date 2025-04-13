@@ -1,7 +1,7 @@
 import numpy as np
 import copy
 
-INDEX_CONJECTURE = 4
+BEST_SCORE = 0
 
 class Move:
     def __init__(self, start, end):
@@ -25,7 +25,6 @@ class Graph:
         self.best_score = self.score()
         self.no_improvement_possible = False
         self.sequence = []
-        self.score_to_refute = 0
     
     def play(self, move:Move) -> None:
         """
@@ -82,13 +81,10 @@ class Graph:
 
     def score(self) -> float:
         eigen = np.linalg.eigh(self.adj_mat)[0][::-1]
-        eigen = eigen[INDEX_CONJECTURE-1]
-
-        # Score with blowup graphs
-        return -(np.floor(self.n_vertices / INDEX_CONJECTURE) - eigen -1)
+        return eigen[0] + eigen[1] - self.n_vertices - 1e-10    # Add a small noise to avoid floating point error
 
     def terminal(self) -> bool:
-        return self.score() > 0
+        return self.score() > BEST_SCORE
 
 
     def clone(self):

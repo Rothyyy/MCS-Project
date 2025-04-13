@@ -1,14 +1,20 @@
 import numpy as np
-from State_Diameter import Graph
-from State_Diameter import BEST_SCORE
 import time
+
+# Import of Graph
+# from State_Diameter import Graph, BEST_SCORE
+# from State_EigenUpperbound import Graph, BEST_SCORE
+# from State_spectralGap_TriangleFree import Graph, BEST_SCORE
+# from State_11 import Graph, BEST_SCORE
+# from State_16 import Graph, BEST_SCORE
+from State_21 import Graph, BEST_SCORE
 
 MAX_TIMEOUT = 300
 NUM_PLAYOUT = 50
 
 class NRPA:
     def __init__(self):
-        self.best_score_yet = -1
+        self.best_score_yet = -np.inf
         self.start_time = time.time()
 
     def random_move(self, move_list, policy:dict):

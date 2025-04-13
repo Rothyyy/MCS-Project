@@ -1,7 +1,7 @@
 import numpy as np
 import copy
 
-INDEX_CONJECTURE = 4
+BEST_SCORE = 0
 
 class Move:
     def __init__(self, start, end):
@@ -18,6 +18,7 @@ class Move:
 
         return 2*n*self.start + 2*self.end + add_or_remove
 
+
 class Graph:
     def __init__(self, n_vertices, adj_mat):
         self.n_vertices = n_vertices
@@ -25,7 +26,6 @@ class Graph:
         self.best_score = self.score()
         self.no_improvement_possible = False
         self.sequence = []
-        self.score_to_refute = 0
     
     def play(self, move:Move) -> None:
         """
@@ -45,9 +45,9 @@ class Graph:
             self.adj_mat[start, end] = 1
             self.adj_mat[end, start] = 1
         # If we consider that we can remove an edge
-        else:
-            self.adj_mat[start, end] = 0
-            self.adj_mat[end, start] = 0
+        # else:
+        #     self.adj_mat[start, end] = 0
+        #     self.adj_mat[end, start] = 0
         return None
     
     def legal_moves(self) -> list:
@@ -81,15 +81,35 @@ class Graph:
 
 
     def score(self) -> float:
-        eigen = np.linalg.eigh(self.adj_mat)[0][::-1]
-        eigen = eigen[INDEX_CONJECTURE-1]
+        eigen_G = np.linalg.eigh(self.adj_mat)[0][-1]
+        compl_adj_mat = self.build_complement_graph()
+        eigen_G_compl = np.linalg.eigh(compl_adj_mat)[0][-1]
 
-        # Score with blowup graphs
-        return -(np.floor(self.n_vertices / INDEX_CONJECTURE) - eigen -1)
+        if self.n_vertices % 3 == 1:
+            return eigen_G + eigen_G_compl - (4/3)*self.n_vertices + (5/3) + f1(self.n_vertices) - 1e-10
+        elif self.n_vertices % 3 == 2:
+            return eigen_G + eigen_G_compl - (4/3)*self.n_vertices + (5/3) - 1e-10
+        else:
+            return eigen_G + eigen_G_compl - (4/3)*self.n_vertices + (5/3) + f2(self.n_vertices) - 1e-10
+
 
     def terminal(self) -> bool:
-        return self.score() > 0
-
+        return self.score() > BEST_SCORE
 
     def clone(self):
         return copy.deepcopy(self)
+    
+
+    def build_complement_graph(self):
+        """
+        This function will return the adjacency matrix of the complement.
+        """
+        complement_adj_mat = np.ones((self.n_vertices, self.n_vertices)) - np.eye(self.n_vertices) - self.adj_mat
+        return complement_adj_mat
+
+
+def f1(n):
+    return (3*n - 2 - np.sqrt(9*(n**2) - 12*n +12)) / 6 
+
+def f2(n):
+    return (3*n - 1 - np.sqrt(9*(n**2) - 6*n +9)) / 6
