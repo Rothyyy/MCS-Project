@@ -46,12 +46,13 @@ def main():
 
     # Initialize parameters
     n = 12
-    level = 1
+    level = 2
 
     # Algorithm launch
     print("Algorithm start")
     match args.state:
         case 1:
+            n = 14
             init_state = make_path_func(n)
         case 2:
             init_state = make_path_func(n)
