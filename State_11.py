@@ -1,4 +1,5 @@
 import numpy as np
+import networkx as nx
 import copy
 
 BEST_SCORE = 0
@@ -113,3 +114,38 @@ def f1(n):
 
 def f2(n):
     return (3*n - 1 - np.sqrt(9*(n**2) - 6*n +9)) / 6
+
+def make_path(n_vertices: int) -> Graph:
+    """
+    This function will return a Graph corresponding to a path on n vertices.
+    """
+    adjacency_matrix = np.eye(n_vertices, k=1) + np.eye(n_vertices, k=-1)
+    g = Graph(n_vertices, adjacency_matrix)
+    return g
+
+def make_random_graph(n_vertices: int) -> Graph: 
+    """
+    This function will return a Graph cooreponding to a randomly generated graph on n vertices.
+    """
+    G = nx.powerlaw_cluster_graph(n=n_vertices, m=4, p=0.5)
+    adjacency_matrix = nx.adjacency_matrix(G).toarray()
+    g = Graph(n_vertices, adjacency_matrix)
+    return g
+
+
+def make_complete_graph(n_vertices: int) -> Graph:
+    """
+    This function will return a Graph correponding to a complete graph on n vertices.
+    """
+    adjacency_matrix = np.ones((n_vertices, n_vertices)) - np.eye(n_vertices)
+    g = Graph(n_vertices, adjacency_matrix)
+    return g
+
+def make_random_tree(n_vertices: int) -> Graph:
+    """
+    This function will return a Graph corresponding to a randomly generated tree on n vertices.
+    """
+    G = nx.random_tree(n_vertices)
+    adj_mat = nx.adjacency_matrix(G).toarray()
+    g = Graph(n_vertices, adj_mat)
+    return g
